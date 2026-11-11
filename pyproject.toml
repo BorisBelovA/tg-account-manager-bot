@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tg-expense-bot"
+version = "0.1.0"
+description = "Telegram bot for tracking shared expenses on a common bank account"
+requires-python = ">=3.11"
+dependencies = [
+    "aiogram>=3.13,<4",
+    "SQLAlchemy>=2.0,<3",
+    "python-dotenv>=1.0,<2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["bot"]
