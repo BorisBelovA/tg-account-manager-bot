@@ -1,0 +1,18 @@
+[Unit]
+Description=Telegram shared-expense bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Change User to the account that owns /opt/expense-bot
+User=expensebot
+WorkingDirectory=/opt/expense-bot
+EnvironmentFile=/opt/expense-bot/.env
+ExecStart=/opt/expense-bot/.venv/bin/python -m bot.main
+Restart=always
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

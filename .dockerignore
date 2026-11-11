@@ -1,0 +1,25 @@
+# Never send secrets or local state into the image build context.
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.py[cod]
+*.egg-info
+data
+backups
+.env
+.env.*
+!.env.example
+*.db
+*.sqlite*
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.idea
+.vscode
+*.md
+smoke_test.py
+flow_test.py
+routing_test.py
+run.cmd
