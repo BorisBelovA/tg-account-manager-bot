@@ -23,10 +23,20 @@ if _DB_PATH.exists():
 from aiogram import Bot  # noqa: E402
 from aiogram.fsm.context import FSMContext  # noqa: E402
 from aiogram.fsm.storage.base import StorageKey  # noqa: E402
-from aiogram.types import CallbackQuery, Chat, Message, Update, User  # noqa: E402
+from aiogram.types import (  # noqa: E402
+    BotCommandScopeAllPrivateChats,
+    CallbackQuery,
+    Chat,
+    InlineKeyboardMarkup,
+    MenuButtonCommands,
+    Message,
+    Update,
+    User,
+)
 
 from bot.db import init_db  # noqa: E402
 from bot.main import create_dispatcher  # noqa: E402
+from bot.menu import BOT_COMMANDS, setup_menu_button  # noqa: E402
 
 
 def check(condition: object, label: str) -> None:
@@ -46,12 +56,41 @@ class Recorder:
         return {}
 
 
+class FakeMenuBot:
+    """Captures the two Bot API calls made by :func:`setup_menu_button`."""
+
+    def __init__(self) -> None:
+        self.commands: list | None = None
+        self.scope = None
+        self.menu_button = None
+
+    async def set_my_commands(self, commands, scope=None):  # noqa: ANN001
+        self.commands = list(commands)
+        self.scope = scope
+
+    async def set_chat_menu_button(self, menu_button=None):  # noqa: ANN001
+        self.menu_button = menu_button
+
+
 async def main() -> None:
     init_db()
     bot = Bot(token="123:TEST")
     recorder = Recorder()
     bot.session.make_request = recorder  # type: ignore[method-assign]
     dp = create_dispatcher()
+
+    # The persistent menu button is configured once at startup.
+    menu_bot = FakeMenuBot()
+    await setup_menu_button(menu_bot)
+    check(menu_bot.commands == list(BOT_COMMANDS), "menu: command catalog registered")
+    check(
+        isinstance(menu_bot.scope, BotCommandScopeAllPrivateChats),
+        "menu: commands scoped to private chats",
+    )
+    check(
+        isinstance(menu_bot.menu_button, MenuButtonCommands),
+        "menu: chat menu button set to commands",
+    )
 
     user = User(id=1, is_bot=False, first_name="Alice")
     chat = Chat(id=1, type="private")
@@ -149,6 +188,21 @@ async def main() -> None:
     await send_text("/spend")
     await send_text("/help")
     check("Shared expense bot" in last_text(), "routing: /help not swallowed by FSM")
+
+    # 15. /menu clears the pending flow and renders the operations menu.
+    await send_text("/menu")
+    check("What would you like to do?" in last_text(), "routing: /menu shows the operations menu")
+    check(await ctx.get_state() is None, "routing: /menu clears pending flow")
+    markup = getattr(recorder.methods[-1], "reply_markup", None)
+    check(
+        isinstance(markup, InlineKeyboardMarkup)
+        and any(
+            button.callback_data == "menu:accounts"
+            for row in markup.inline_keyboard
+            for button in row
+        ),
+        "routing: /menu exposes account operations",
+    )
 
     print("\nAll routing tests passed")
 

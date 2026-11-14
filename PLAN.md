@@ -35,7 +35,8 @@ good way to split/track who spent what. The bot gives a shared ledger in Telegra
 5. Show remaining balance and per-member spend breakdown.
 6. List recent transactions.
 7. Adjust the starting balance (`/setbalance`).
-8. Basic validation and friendly error messages.
+8. Persistent menu button (bottom-left of the message input) listing all account operations.
+9. Basic validation and friendly error messages.
 
 ### Iteration 2 — reports & analytics (deferred)
 
@@ -204,6 +205,7 @@ earned_by_member(account, user) =
 | Command | Example | Effect |
 |---|---|---|
 | `/start` | — | Register user, show main menu (inline keyboard) |
+| `/menu` | — | Open the operations menu (same as the persistent menu button) |
 | `/create <name>` | `/create Family` | Start create-account flow (currency → initial balance → confirm) |
 | `/invite` | — | Generate join link for the current account |
 | `/spend <amount>` | `/spend 12.50` | Start expense flow (category → note → confirm) |
@@ -358,6 +360,7 @@ tg-expense-bot/
 │  │  ├─ invites.py           # token generation/validation
 │  │  └─ accounts.py          # membership checks, active-account
 │  ├─ states.py               # aiogram StatesGroups (FSM)
+│  ├─ menu.py                 # persistent menu button + command catalog
 │  └─ keyboards.py            # inline keyboards
 ├─ migrations/                # Alembic (or SQLAlchemy create_all for MVP)
 ├─ data/                      # SQLite file (git-ignored)

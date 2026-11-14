@@ -42,9 +42,12 @@ async def cmd_start(message: Message, command: CommandObject, state: FSMContext)
                 "1. Create an account with <code>/create Family</code>\n"
                 "2. Invite the other person with /invite\n"
                 "3. Record money with /spend and /income\n\n"
-                "Tip: /help lists every command."
+                "Tip: the menu button next to the message field lists every operation."
             )
         else:
-            text = "👋 Welcome back! What would you like to do?"
+            text = (
+                "👋 Welcome back! What would you like to do?\n\n"
+                "Tip: the menu button next to the message field lists every operation."
+            )
 
     await message.answer(text, reply_markup=main_menu())

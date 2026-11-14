@@ -14,6 +14,7 @@ how much each person has spent.
 - See the remaining balance and a per-member spending breakdown.
 - Browse recent transactions.
 - Adjust the starting balance.
+- **Persistent menu button** (bottom-left of the message field) with every operation one tap away.
 
 ## Requirements
 
@@ -50,6 +51,7 @@ Stop the bot with `Ctrl+C`.
 | Command | Description |
 |---|---|
 | `/start` | Register and show the main menu |
+| `/menu` | Open the main menu (also available via the persistent menu button) |
 | `/create <name>` | Create a shared account (choose EUR/USD, then starting balance) |
 | `/invite` | Generate a single-use join link (owner only) |
 | `/spend <amount> [note]` | Record an expense |
@@ -63,6 +65,17 @@ Stop the bot with `Ctrl+C`.
 | `/help` | Command reference |
 
 Amounts accept `12.50`, `12,50` and `1 234,56`.
+
+## Menu button
+
+On startup the bot registers its command catalog with Telegram and sets the chat
+menu button to **Commands**.  That is the small button at the bottom-left of the
+message field in Telegram clients; tapping it always shows the account and money
+operations — no need to remember slash commands or scroll back to `/start`.
+
+The catalog lives in `bot/menu.py`, so adding an operation there is enough.  No
+BotFather configuration is required.  If Telegram is unreachable at startup the
+bot logs a warning and keeps working; the button is configured on the next start.
 
 ## How the numbers work
 
@@ -87,6 +100,7 @@ bot/
 ├─ models.py        # SQLAlchemy models
 ├─ currency.py      # minor-unit parsing / formatting
 ├─ keyboards.py     # inline keyboards
+├─ menu.py          # persistent menu button + command catalog
 ├─ states.py        # FSM state groups
 ├─ utils.py         # HTML escaping
 ├─ handlers/        # common, start, account, invite, transactions, balance

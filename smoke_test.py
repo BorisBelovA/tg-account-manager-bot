@@ -121,6 +121,7 @@ def test_handlers_importable() -> None:
     import bot.handlers.start  # noqa: F401
     import bot.handlers.transactions  # noqa: F401
     import bot.main  # noqa: F401
+    import bot.menu  # noqa: F401
 
     from bot.handlers.transactions import normalize_category, recent_categories
 
@@ -154,10 +155,37 @@ def test_handlers_importable() -> None:
         check("Food" in cats and "Travel" in cats, "recent categories")
 
 
+def test_menu_catalog() -> None:
+    """The persistent menu button must list every account operation."""
+    import re
+
+    from bot.menu import BOT_COMMANDS
+
+    names = [command.command for command in BOT_COMMANDS]
+    check(len(names) == len(set(names)), "menu: command names are unique")
+    check(
+        {"menu", "accounts", "create", "invite", "setbalance"} <= set(names),
+        "menu: account operations listed",
+    )
+    check(
+        {"spend", "income", "balance", "history"} <= set(names),
+        "menu: money operations listed",
+    )
+    check(
+        all(re.fullmatch(r"[a-z0-9_]{1,32}", name) for name in names),
+        "menu: command names are valid for Telegram",
+    )
+    check(
+        all(command.description for command in BOT_COMMANDS),
+        "menu: every command has a description",
+    )
+
+
 def main() -> None:
     test_currency()
     test_database()
     test_handlers_importable()
+    test_menu_catalog()
     print("\nAll smoke tests passed")
 
 

@@ -6,10 +6,13 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
+from ..keyboards import main_menu
+
 router = Router(name="common")
 
 HELP_TEXT = (
     "<b>Shared expense bot</b>\n\n"
+    "Tip: the menu button next to the message field opens this list at any time.\n\n"
     "<b>Money</b>\n"
     "/spend &lt;amount&gt; [note] — record an expense\n"
     "/income &lt;amount&gt; [note] — record an income\n"
@@ -21,10 +24,17 @@ HELP_TEXT = (
     "/accounts — switch active account\n"
     "/setbalance &lt;amount&gt; — set the starting balance (owner only)\n\n"
     "<b>Other</b>\n"
+    "/menu — open the main menu\n"
     "/cancel — cancel the current action\n"
     "/skip — skip an optional step\n"
     "/help — show this message"
 )
+
+
+@router.message(Command("menu"))
+async def cmd_menu(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    await message.answer("What would you like to do?", reply_markup=main_menu())
 
 
 @router.message(Command("help"))

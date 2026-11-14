@@ -17,6 +17,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from .config import BOT_TOKEN, LOG_LEVEL
 from .db import init_db
 from .handlers import account, balance, common, invite, start, transactions
+from .menu import setup_menu_button
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,7 @@ async def main() -> None:
 
     init_db()
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    await setup_menu_button(bot)
     dispatcher = create_dispatcher()
     logger.info("Starting long polling…")
     await dispatcher.start_polling(bot)
